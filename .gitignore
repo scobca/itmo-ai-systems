@@ -1,2 +1,4 @@
 .idea
 itmo-ai-systems.iml
+__pycache__/
+*.pyc

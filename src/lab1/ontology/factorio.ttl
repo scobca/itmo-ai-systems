@@ -1,0 +1,152 @@
+@prefix : <https://example.org/factorio#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://example.org/factorio> a owl:Ontology ;
+  rdfs:comment "Educational Factorio production subset derived from the Prolog facts."@en .
+
+:ProductionEntity a owl:Class .
+:Material a owl:Class ; rdfs:subClassOf :ProductionEntity .
+:RawResource a owl:Class ; rdfs:subClassOf :Material ;
+  owl:disjointWith :IntermediateProduct .
+:FluidResource a owl:Class ; rdfs:subClassOf :RawResource .
+:SolidResource a owl:Class ; rdfs:subClassOf :RawResource ;
+  owl:disjointWith :FluidResource .
+:IntermediateProduct a owl:Class ; rdfs:subClassOf :Material .
+:MetalPlate a owl:Class ; rdfs:subClassOf :IntermediateProduct .
+:Machine a owl:Class ; rdfs:subClassOf :ProductionEntity ;
+  rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :poweredBy ;
+                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onClass :PowerSource ] .
+:Furnace a owl:Class ; rdfs:subClassOf :Machine ; owl:disjointWith :Assembler .
+:Assembler a owl:Class ; rdfs:subClassOf :Machine ; owl:disjointWith :ChemicalPlant .
+:ChemicalPlant a owl:Class ; rdfs:subClassOf :Machine ; owl:disjointWith :Foundry .
+:Foundry a owl:Class ; rdfs:subClassOf :Machine ; owl:disjointWith :Furnace .
+:Planet a owl:Class .
+:PowerSource a owl:Class .
+:Recipe a owl:Class ;
+  rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :produces ;
+                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onClass :IntermediateProduct ] .
+:IngredientUse a owl:Class ;
+  rdfs:subClassOf [ a owl:Restriction ; owl:onProperty :material ;
+                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onClass :Material ] .
+
+:availableOn a owl:ObjectProperty ; rdfs:domain :Machine ; rdfs:range :Planet ;
+  rdfs:comment "Local availability without interplanetary transport."@en .
+:poweredBy a owl:ObjectProperty ; rdfs:domain :Machine ; rdfs:range :PowerSource .
+:supportsRecipe a owl:ObjectProperty ; rdfs:domain :Machine ; rdfs:range :Recipe .
+:produces a owl:ObjectProperty ; rdfs:domain :Recipe ; rdfs:range :IntermediateProduct .
+:hasIngredientUse a owl:ObjectProperty ; rdfs:domain :Recipe ; rdfs:range :IngredientUse .
+:material a owl:ObjectProperty ; rdfs:domain :IngredientUse ; rdfs:range :Material .
+:speed a owl:DatatypeProperty ; rdfs:domain :Machine ; rdfs:range xsd:decimal .
+:powerKW a owl:DatatypeProperty ; rdfs:domain :Machine ; rdfs:range xsd:nonNegativeInteger .
+:quantity a owl:DatatypeProperty ; rdfs:domain :IngredientUse ; rdfs:range xsd:positiveInteger .
+:yield a owl:DatatypeProperty ; rdfs:domain :Recipe ; rdfs:range xsd:positiveInteger .
+
+:nauvis a :Planet .
+:vulcanus a :Planet .
+:fuel a :PowerSource ; owl:differentFrom :electricity .
+:electricity a :PowerSource .
+
+:wood a :SolidResource .
+:coal a :SolidResource .
+:stone a :SolidResource .
+:calcite a :SolidResource .
+:iron_ore a :SolidResource .
+:copper_ore a :SolidResource .
+:uranium_ore a :SolidResource .
+:holmium_ore a :SolidResource .
+:tungsten_ore a :SolidResource .
+:lithium a :SolidResource .
+:water a :FluidResource .
+:lava a :FluidResource .
+:crude_oil a :FluidResource .
+:petroleum_gas a :FluidResource .
+:light_oil a :FluidResource .
+:heavy_oil a :FluidResource .
+:lubricant a :FluidResource .
+:sulfuric_acid a :FluidResource .
+:holmium_solution a :FluidResource .
+:electrolyte a :FluidResource .
+:ammoniacal_solution a :FluidResource .
+:ammonia a :FluidResource .
+:iron_plate a :MetalPlate .
+:copper_plate a :MetalPlate .
+:steel_plate a :MetalPlate .
+:stone_brick a :IntermediateProduct .
+:iron_gear_wheel a :IntermediateProduct .
+:copper_cable a :IntermediateProduct .
+:electronic_circuit a :IntermediateProduct .
+:plastic_bar a :IntermediateProduct .
+:sulfur a :IntermediateProduct .
+:molten_iron a :IntermediateProduct .
+:stone_furnace a :Furnace ; :poweredBy :fuel ; :speed "1.0"^^xsd:decimal ; :powerKW "0"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:steel_furnace a :Furnace ; :poweredBy :fuel ; :speed "2.0"^^xsd:decimal ; :powerKW "0"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:electric_furnace a :Furnace ; :poweredBy :electricity ; :speed "2.0"^^xsd:decimal ; :powerKW "180"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:assembling_machine_1 a :Assembler ; :poweredBy :electricity ; :speed "0.5"^^xsd:decimal ; :powerKW "75"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:assembling_machine_2 a :Assembler ; :poweredBy :electricity ; :speed "0.75"^^xsd:decimal ; :powerKW "150"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:chemical_plant a :ChemicalPlant ; :poweredBy :electricity ; :speed "1.0"^^xsd:decimal ; :powerKW "210"^^xsd:nonNegativeInteger ; :availableOn :nauvis ; :availableOn :vulcanus .
+:foundry a :Foundry ; :poweredBy :electricity ; :speed "4.0"^^xsd:decimal ; :powerKW "2500"^^xsd:nonNegativeInteger ; :availableOn :vulcanus .
+:iron_plate_recipe a :Recipe ; :produces :iron_plate ; :yield "1"^^xsd:positiveInteger .
+:stone_furnace :supportsRecipe :iron_plate_recipe .
+:steel_furnace :supportsRecipe :iron_plate_recipe .
+:electric_furnace :supportsRecipe :iron_plate_recipe .
+:copper_plate_recipe a :Recipe ; :produces :copper_plate ; :yield "1"^^xsd:positiveInteger .
+:stone_furnace :supportsRecipe :copper_plate_recipe .
+:steel_furnace :supportsRecipe :copper_plate_recipe .
+:electric_furnace :supportsRecipe :copper_plate_recipe .
+:steel_plate_recipe a :Recipe ; :produces :steel_plate ; :yield "1"^^xsd:positiveInteger .
+:stone_furnace :supportsRecipe :steel_plate_recipe .
+:steel_furnace :supportsRecipe :steel_plate_recipe .
+:electric_furnace :supportsRecipe :steel_plate_recipe .
+:stone_brick_recipe a :Recipe ; :produces :stone_brick ; :yield "1"^^xsd:positiveInteger .
+:stone_furnace :supportsRecipe :stone_brick_recipe .
+:steel_furnace :supportsRecipe :stone_brick_recipe .
+:electric_furnace :supportsRecipe :stone_brick_recipe .
+:iron_gear_wheel_recipe a :Recipe ; :produces :iron_gear_wheel ; :yield "1"^^xsd:positiveInteger .
+:assembling_machine_1 :supportsRecipe :iron_gear_wheel_recipe .
+:assembling_machine_2 :supportsRecipe :iron_gear_wheel_recipe .
+:copper_cable_recipe a :Recipe ; :produces :copper_cable ; :yield "2"^^xsd:positiveInteger .
+:assembling_machine_1 :supportsRecipe :copper_cable_recipe .
+:assembling_machine_2 :supportsRecipe :copper_cable_recipe .
+:electronic_circuit_recipe a :Recipe ; :produces :electronic_circuit ; :yield "1"^^xsd:positiveInteger .
+:assembling_machine_1 :supportsRecipe :electronic_circuit_recipe .
+:assembling_machine_2 :supportsRecipe :electronic_circuit_recipe .
+:plastic_bar_recipe a :Recipe ; :produces :plastic_bar ; :yield "2"^^xsd:positiveInteger .
+:chemical_plant :supportsRecipe :plastic_bar_recipe .
+:sulfur_recipe a :Recipe ; :produces :sulfur ; :yield "2"^^xsd:positiveInteger .
+:chemical_plant :supportsRecipe :sulfur_recipe .
+:molten_iron_recipe a :Recipe ; :produces :molten_iron ; :yield "500"^^xsd:positiveInteger .
+:foundry :supportsRecipe :molten_iron_recipe .
+:iron_plate_recipe :hasIngredientUse :ingredient_use_1 .
+:ingredient_use_1 a :IngredientUse ; :material :iron_ore ; :quantity "1"^^xsd:positiveInteger .
+:copper_plate_recipe :hasIngredientUse :ingredient_use_2 .
+:ingredient_use_2 a :IngredientUse ; :material :copper_ore ; :quantity "1"^^xsd:positiveInteger .
+:steel_plate_recipe :hasIngredientUse :ingredient_use_3 .
+:ingredient_use_3 a :IngredientUse ; :material :iron_plate ; :quantity "5"^^xsd:positiveInteger .
+:stone_brick_recipe :hasIngredientUse :ingredient_use_4 .
+:ingredient_use_4 a :IngredientUse ; :material :stone ; :quantity "2"^^xsd:positiveInteger .
+:iron_gear_wheel_recipe :hasIngredientUse :ingredient_use_5 .
+:ingredient_use_5 a :IngredientUse ; :material :iron_plate ; :quantity "2"^^xsd:positiveInteger .
+:copper_cable_recipe :hasIngredientUse :ingredient_use_6 .
+:ingredient_use_6 a :IngredientUse ; :material :copper_plate ; :quantity "1"^^xsd:positiveInteger .
+:electronic_circuit_recipe :hasIngredientUse :ingredient_use_7 .
+:ingredient_use_7 a :IngredientUse ; :material :iron_plate ; :quantity "1"^^xsd:positiveInteger .
+:electronic_circuit_recipe :hasIngredientUse :ingredient_use_8 .
+:ingredient_use_8 a :IngredientUse ; :material :copper_cable ; :quantity "3"^^xsd:positiveInteger .
+:plastic_bar_recipe :hasIngredientUse :ingredient_use_9 .
+:ingredient_use_9 a :IngredientUse ; :material :petroleum_gas ; :quantity "20"^^xsd:positiveInteger .
+:plastic_bar_recipe :hasIngredientUse :ingredient_use_10 .
+:ingredient_use_10 a :IngredientUse ; :material :coal ; :quantity "1"^^xsd:positiveInteger .
+:sulfur_recipe :hasIngredientUse :ingredient_use_11 .
+:ingredient_use_11 a :IngredientUse ; :material :petroleum_gas ; :quantity "30"^^xsd:positiveInteger .
+:sulfur_recipe :hasIngredientUse :ingredient_use_12 .
+:ingredient_use_12 a :IngredientUse ; :material :water ; :quantity "30"^^xsd:positiveInteger .
+:molten_iron_recipe :hasIngredientUse :ingredient_use_13 .
+:ingredient_use_13 a :IngredientUse ; :material :iron_ore ; :quantity "50"^^xsd:positiveInteger .
+:molten_iron_recipe :hasIngredientUse :ingredient_use_14 .
+:ingredient_use_14 a :IngredientUse ; :material :calcite ; :quantity "1"^^xsd:positiveInteger .
