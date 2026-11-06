@@ -13,55 +13,55 @@ class DSSTests(unittest.TestCase):
 
     def test_fast_electric_furnace(self):
         request = self.request(
-            "Продукт: железная плита; Планета: Наувис; "
-            "Приоритет: скорость; Энергия: электричество"
+            "Product: iron_plate; Planet: nauvis; "
+            "Priority: speed; Energy: electricity"
         )
         self.assertEqual(recommend(request)[0]["machine"], "electric_furnace")
 
     def test_lowest_electric_draw(self):
         request = self.request(
-            "Продукт: железная шестерня; Планета: Наувис; "
-            "Приоритет: электроэнергия; Энергия: электричество"
+            "Product: iron_gear_wheel; Planet: nauvis; "
+            "Priority: electricity; Energy: electricity"
         )
         self.assertEqual(recommend(request)[0]["machine"], "assembling_machine_1")
 
     def test_fuel_and_speed(self):
         request = self.request(
-            "Продукт: железная плита; Планета: Наувис; "
-            "Приоритет: скорость; Энергия: топливо"
+            "Product: iron_plate; Planet: nauvis; "
+            "Priority: speed; Energy: fuel"
         )
         self.assertEqual(recommend(request)[0]["machine"], "steel_furnace")
 
     def test_assembler(self):
         request = self.request(
-            "Продукт: электронная схема; Планета: Наувис; Приоритет: скорость"
+            "Product: electronic_circuit; Planet: nauvis; Priority: speed"
         )
         self.assertEqual(recommend(request)[0]["machine"], "assembling_machine_2")
 
     def test_foundry(self):
         request = self.request(
-            "Продукт: расплавленное железо; Планета: Вулканус; Приоритет: скорость"
+            "Product: molten_iron; Planet: vulcanus; Priority: speed"
         )
         self.assertEqual(recommend(request)[0]["machine"], "foundry")
 
     def test_no_candidate(self):
         request = self.request(
-            "Продукт: расплавленное железо; Планета: Наувис; Приоритет: скорость"
+            "Product: molten_iron; Planet: nauvis; Priority: speed"
         )
         self.assertEqual(recommend(request), [])
-        self.assertIn("нет подходящей машины", explain(request, []))
+        self.assertIn("No suitable machine", explain(request, []))
 
     def test_unknown_value(self):
-        with self.assertRaisesRegex(ValueError, "Неизвестное значение"):
-            parse_fields("Продукт: неизвестный; Планета: Наувис")
+        with self.assertRaisesRegex(ValueError, "Unknown value"):
+            parse_fields("Product: unknown; Planet: nauvis")
 
     def test_conflicting_duplicate(self):
-        with self.assertRaisesRegex(ValueError, "дважды"):
-            parse_fields("Планета: Наувис; Планета: Вулканус")
+        with self.assertRaisesRegex(ValueError, "Duplicate field"):
+            parse_fields("Planet: nauvis; Planet: vulcanus")
 
     def test_missing_slot_prompts(self):
-        fields = parse_fields("Продукт: сера")
-        with patch("builtins.input", side_effect=["Наувис", "скорость"]):
+        fields = parse_fields("Product: sulfur")
+        with patch("builtins.input", side_effect=["nauvis", "speed"]):
             self.assertEqual(ask_missing(fields), Request("sulfur", "nauvis", "speed", "any"))
 
 

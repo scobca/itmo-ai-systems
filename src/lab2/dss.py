@@ -1,9 +1,9 @@
 """Command-line decision support over the Lab 1 Factorio Prolog knowledge base.
 
-Input format: Продукт: железная плита; Планета: Наувис;
-              Приоритет: скорость; Энергия: электричество
+Input format: product: iron_plate; planet: nauvis;
+              priority: speed; energy: electricity
 The first three slots are required; missing slots are requested interactively.
-Energy is optional and defaults to "любая".
+Energy is optional and defaults to "any".
 """
 
 from __future__ import annotations
@@ -18,41 +18,41 @@ from pathlib import Path
 KB = Path(__file__).resolve().parents[1] / "lab1" / "factorio.pl"
 
 FIELDS = {
-    "продукт": "product",
-    "планета": "planet",
-    "приоритет": "priority",
-    "энергия": "energy",
+    "product": "product",
+    "planet": "planet",
+    "priority": "priority",
+    "energy": "energy",
 }
 VALUES = {
     "product": {
-        "железная плита": "iron_plate",
-        "медная плита": "copper_plate",
-        "стальная плита": "steel_plate",
-        "каменный кирпич": "stone_brick",
-        "железная шестерня": "iron_gear_wheel",
-        "медный кабель": "copper_cable",
-        "электронная схема": "electronic_circuit",
-        "пластмасса": "plastic_bar",
-        "сера": "sulfur",
-        "расплавленное железо": "molten_iron",
+        "iron_plate": "iron_plate",
+        "copper_plate": "copper_plate",
+        "steel_plate": "steel_plate",
+        "stone_brick": "stone_brick",
+        "iron_gear_wheel": "iron_gear_wheel",
+        "copper_cable": "copper_cable",
+        "electronic_circuit": "electronic_circuit",
+        "plastic_bar": "plastic_bar",
+        "sulfur": "sulfur",
+        "molten_iron": "molten_iron",
     },
-    "planet": {"наувис": "nauvis", "вулканус": "vulcanus"},
-    "priority": {"скорость": "speed", "электроэнергия": "electricity"},
-    "energy": {"любая": "any", "электричество": "electricity", "топливо": "fuel"},
+    "planet": {"nauvis": "nauvis", "vulcanus": "vulcanus"},
+    "priority": {"speed": "speed", "electricity": "electricity"},
+    "energy": {"any": "any", "electricity": "electricity", "fuel": "fuel"},
 }
 MACHINE_NAMES = {
-    "stone_furnace": "каменная печь",
-    "steel_furnace": "стальная печь",
-    "electric_furnace": "электрическая печь",
-    "assembling_machine_1": "сборочный автомат 1",
-    "assembling_machine_2": "сборочный автомат 2",
-    "chemical_plant": "химический завод",
-    "foundry": "литейная",
+    "stone_furnace": "stone furnace",
+    "steel_furnace": "steel furnace",
+    "electric_furnace": "electric furnace",
+    "assembling_machine_1": "assembling machine 1",
+    "assembling_machine_2": "assembling machine 2",
+    "chemical_plant": "chemical plant",
+    "foundry": "foundry",
 }
 PROMPTS = {
-    "product": "Какой продукт нужен?",
-    "planet": "На какой планете (Наувис/Вулканус)?",
-    "priority": "Что важнее (скорость/электроэнергия)?",
+    "product": "Which product do you need?",
+    "planet": "Which planet (nauvis/vulcanus)?",
+    "priority": "Which priority (speed/electricity)?",
 }
 
 
@@ -71,17 +71,17 @@ def parse_fields(line: str) -> dict[str, str]:
         if not segment.strip():
             continue
         if segment.count(":") != 1:
-            raise ValueError(f"Ожидается поле «Ключ: значение»: {segment.strip()}")
+            raise ValueError(f"Expected a 'key: value' field: {segment.strip()}")
         label, value = (part.strip().casefold() for part in segment.split(":", 1))
         field = FIELDS.get(label)
         if field is None:
-            raise ValueError(f"Неизвестное поле: {label}")
+            raise ValueError(f"Unknown field: {label}")
         if field in result:
-            raise ValueError(f"Поле «{label}» указано дважды")
+            raise ValueError(f"Duplicate field: {label}")
         normalized = VALUES[field].get(value)
         if normalized is None:
             choices = ", ".join(VALUES[field])
-            raise ValueError(f"Неизвестное значение «{value}» для «{label}». Варианты: {choices}")
+            raise ValueError(f"Unknown value '{value}' for '{label}'. Choices: {choices}")
         result[field] = normalized
     return result
 
@@ -89,7 +89,7 @@ def parse_fields(line: str) -> dict[str, str]:
 def make_request(fields: dict[str, str]) -> Request:
     missing = [field for field in ("product", "planet", "priority") if field not in fields]
     if missing:
-        raise ValueError("Не заполнены поля: " + ", ".join(missing))
+        raise ValueError("Missing fields: " + ", ".join(missing))
     return Request(fields["product"], fields["planet"], fields["priority"],
                    fields.get("energy", "any"))
 
@@ -100,7 +100,7 @@ def ask_missing(fields: dict[str, str]) -> Request:
             try:
                 answer = input(PROMPTS[field] + " ").strip()
             except EOFError as exc:
-                raise ValueError("Ввод завершился до заполнения обязательных полей") from exc
+                raise ValueError("Input ended before all required fields were provided") from exc
             label = next(label for label, key in FIELDS.items() if key == field)
             try:
                 fields.update(parse_fields(f"{label}: {answer}"))
@@ -128,7 +128,7 @@ def query_prolog(request: Request) -> list[dict]:
             check=True, capture_output=True, text=True, timeout=10,
         )
     except (FileNotFoundError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-        raise RuntimeError(f"Не удалось выполнить запрос к SWI-Prolog: {exc}") from exc
+        raise RuntimeError(f"SWI-Prolog query failed: {exc}") from exc
     return json.loads(completed.stdout)
 
 
@@ -143,37 +143,37 @@ def recommend(request: Request) -> list[dict]:
 
 def explain(request: Request, candidates: list[dict]) -> str:
     if not candidates:
-        return ("Для выбранных продукта, планеты и источника энергии в базе нет "
-                "подходящей машины. Проверьте условия или выберите другую планету.")
+        return ("No suitable machine was found for this product, planet, and "
+                "energy source. Check the conditions or choose another planet.")
     best = candidates[0]
     measure = (
-        f"скорость {best['speed']}"
+        f"speed {best['speed']}"
         if request.priority == "speed"
-        else f"потребление электричества {best['power_kw']} кВт"
+        else f"electric power consumption {best['power_kw']} kW"
     )
-    energy = "электричество" if best["power_source"] == "electricity" else "топливо"
+    energy = best["power_source"]
     others = ", ".join(MACHINE_NAMES[item["machine"]] for item in candidates[1:])
-    suffix = f" Другие подходящие: {others}." if others else ""
+    suffix = f" Other suitable machines: {others}." if others else ""
     return (
-        f"Рекомендация: {MACHINE_NAMES[best['machine']]}. "
-        f"Правила can_craft/3 и power_source/2 подтверждают продукт, планету "
-        f"и источник энергии ({energy}); выбранный критерий: {measure}.{suffix}"
+        f"Recommendation: {MACHINE_NAMES[best['machine']]}. "
+        f"The can_craft/3 and power_source/2 rules confirm the product, planet, "
+        f"and energy source ({energy}); selected criterion: {measure}.{suffix}"
     )
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--text", help="фиксированная строка запроса; без нее ввод интерактивный")
+    parser.add_argument("--text", help="request text; omit for interactive input")
     args = parser.parse_args()
     try:
         line = args.text if args.text is not None else input(
-            "Введите запрос (Продукт: ...; Планета: ...; Приоритет: ...; Энергия: ...): "
+            "Enter request (product: ...; planet: ...; priority: ...; energy: ...): "
         )
         request = ask_missing(parse_fields(line))
         print(explain(request, recommend(request)))
         return 0
     except (ValueError, RuntimeError, EOFError) as exc:
-        print(f"Ошибка: {exc}", file=sys.stderr)
+        print(f"Error: {exc}", file=sys.stderr)
         return 2
 
 
