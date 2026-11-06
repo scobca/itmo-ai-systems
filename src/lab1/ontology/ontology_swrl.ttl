@@ -1,0 +1,1133 @@
+@prefix : <https://example.org/factorio#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <https://example.org/factorio#> .
+
+<https://example.org/factorio> rdf:type owl:Ontology ;
+                                rdfs:comment "Educational Factorio production subset derived from the Prolog facts."@en .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled
+<http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://example.org/factorio#availableOn
+:availableOn rdf:type owl:ObjectProperty ;
+             rdfs:domain :Machine ,
+                         :ProductionEntity ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :poweredBy ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :PowerSource
+                         ] ;
+             rdfs:range :Planet ;
+             rdfs:comment "Local availability without interplanetary transport."@en .
+
+
+###  https://example.org/factorio#hasIngredientUse
+:hasIngredientUse rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Recipe ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :produces ;
+                                owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                owl:onClass :IntermediateProduct
+                              ] ;
+                  rdfs:range :IngredientUse ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :material ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :Material
+                             ] .
+
+
+###  https://example.org/factorio#material
+:material rdf:type owl:ObjectProperty ;
+          rdfs:domain :IngredientUse ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :material ;
+                        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                        owl:onClass :Material
+                      ] ;
+          rdfs:range :Material ,
+                     :ProductionEntity .
+
+
+###  https://example.org/factorio#poweredBy
+:poweredBy rdf:type owl:ObjectProperty ;
+           rdfs:domain :Machine ,
+                       :ProductionEntity ,
+                       [ rdf:type owl:Restriction ;
+                         owl:onProperty :poweredBy ;
+                         owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                         owl:onClass :PowerSource
+                       ] ;
+           rdfs:range :PowerSource .
+
+
+###  https://example.org/factorio#produces
+:produces rdf:type owl:ObjectProperty ;
+          rdfs:domain :Recipe ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :produces ;
+                        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                        owl:onClass :IntermediateProduct
+                      ] ;
+          rdfs:range :IntermediateProduct ,
+                     :Material ,
+                     :ProductionEntity .
+
+
+###  https://example.org/factorio#rawMaterial
+:rawMaterial rdf:type owl:ObjectProperty ;
+             rdfs:domain :IntermediateProduct ,
+                         :Material ,
+                         :ProductionEntity ;
+             rdfs:range :Material ,
+                        :ProductionEntity ,
+                        :RawResource .
+
+
+###  https://example.org/factorio#supportsRecipe
+:supportsRecipe rdf:type owl:ObjectProperty ;
+                rdfs:domain :Machine ,
+                            :ProductionEntity ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :poweredBy ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :PowerSource
+                            ] ;
+                rdfs:range :Recipe ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :produces ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :IntermediateProduct
+                           ] .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  https://example.org/factorio#powerKW
+:powerKW rdf:type owl:DatatypeProperty ;
+         rdfs:domain :Machine ,
+                     :ProductionEntity ,
+                     [ rdf:type owl:Restriction ;
+                       owl:onProperty :poweredBy ;
+                       owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                       owl:onClass :PowerSource
+                     ] ;
+         rdfs:range xsd:nonNegativeInteger .
+
+
+###  https://example.org/factorio#quantity
+:quantity rdf:type owl:DatatypeProperty ;
+          rdfs:domain :IngredientUse ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :material ;
+                        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                        owl:onClass :Material
+                      ] ;
+          rdfs:range xsd:positiveInteger .
+
+
+###  https://example.org/factorio#speed
+:speed rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Machine ,
+                   :ProductionEntity ,
+                   [ rdf:type owl:Restriction ;
+                     owl:onProperty :poweredBy ;
+                     owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                     owl:onClass :PowerSource
+                   ] ;
+       rdfs:range xsd:decimal .
+
+
+###  https://example.org/factorio#yield
+:yield rdf:type owl:DatatypeProperty ;
+       rdfs:domain :Recipe ,
+                   [ rdf:type owl:Restriction ;
+                     owl:onProperty :produces ;
+                     owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                     owl:onClass :IntermediateProduct
+                   ] ;
+       rdfs:range xsd:positiveInteger .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  https://example.org/factorio#Assembler
+:Assembler rdf:type owl:Class ;
+           rdfs:subClassOf :Machine ,
+                           :ProductionEntity ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :poweredBy ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :PowerSource
+                           ] ;
+           owl:disjointWith :ChemicalPlant ,
+                            :Furnace .
+
+
+###  https://example.org/factorio#ChemicalPlant
+:ChemicalPlant rdf:type owl:Class ;
+               rdfs:subClassOf :Machine ,
+                               :ProductionEntity ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :poweredBy ;
+                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :PowerSource
+                               ] ;
+               owl:disjointWith :Foundry .
+
+
+###  https://example.org/factorio#FluidResource
+:FluidResource rdf:type owl:Class ;
+               rdfs:subClassOf :Material ,
+                               :ProductionEntity ,
+                               :RawResource ;
+               owl:disjointWith :SolidResource .
+
+
+###  https://example.org/factorio#Foundry
+:Foundry rdf:type owl:Class ;
+         rdfs:subClassOf :Machine ,
+                         :ProductionEntity ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :poweredBy ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :PowerSource
+                         ] ;
+         owl:disjointWith :Furnace .
+
+
+###  https://example.org/factorio#Furnace
+:Furnace rdf:type owl:Class ;
+         rdfs:subClassOf :Machine ,
+                         :ProductionEntity ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :poweredBy ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :PowerSource
+                         ] .
+
+
+###  https://example.org/factorio#IngredientUse
+:IngredientUse rdf:type owl:Class ;
+               rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                 owl:onProperty :material ;
+                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :Material
+                               ] .
+
+
+###  https://example.org/factorio#IntermediateProduct
+:IntermediateProduct rdf:type owl:Class ;
+                     rdfs:subClassOf :Material ,
+                                     :ProductionEntity ;
+                     owl:disjointWith :RawResource .
+
+
+###  https://example.org/factorio#Machine
+:Machine rdf:type owl:Class ;
+         rdfs:subClassOf :ProductionEntity ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :poweredBy ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :PowerSource
+                         ] .
+
+
+###  https://example.org/factorio#Material
+:Material rdf:type owl:Class ;
+          rdfs:subClassOf :ProductionEntity .
+
+
+###  https://example.org/factorio#MetalPlate
+:MetalPlate rdf:type owl:Class ;
+            rdfs:subClassOf :IntermediateProduct ,
+                            :Material ,
+                            :ProductionEntity .
+
+
+###  https://example.org/factorio#Planet
+:Planet rdf:type owl:Class .
+
+
+###  https://example.org/factorio#PowerSource
+:PowerSource rdf:type owl:Class .
+
+
+###  https://example.org/factorio#ProductionEntity
+:ProductionEntity rdf:type owl:Class .
+
+
+###  https://example.org/factorio#RawResource
+:RawResource rdf:type owl:Class ;
+             rdfs:subClassOf :Material ,
+                             :ProductionEntity .
+
+
+###  https://example.org/factorio#Recipe
+:Recipe rdf:type owl:Class ;
+        rdfs:subClassOf [ rdf:type owl:Restriction ;
+                          owl:onProperty :produces ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :IntermediateProduct
+                        ] .
+
+
+###  https://example.org/factorio#SolidResource
+:SolidResource rdf:type owl:Class ;
+               rdfs:subClassOf :Material ,
+                               :ProductionEntity ,
+                               :RawResource .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://example.org/factorio#ammonia
+:ammonia rdf:type owl:NamedIndividual ,
+                  :FluidResource ,
+                  :Material ,
+                  :ProductionEntity ,
+                  :RawResource .
+
+
+###  https://example.org/factorio#ammoniacal_solution
+:ammoniacal_solution rdf:type owl:NamedIndividual ,
+                              :FluidResource ,
+                              :Material ,
+                              :ProductionEntity ,
+                              :RawResource .
+
+
+###  https://example.org/factorio#assembling_machine_1
+:assembling_machine_1 rdf:type owl:NamedIndividual ,
+                               :Assembler ,
+                               :Machine ,
+                               :ProductionEntity ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :poweredBy ;
+                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :PowerSource
+                               ] ;
+                      :availableOn :nauvis ,
+                                   :vulcanus ;
+                      :poweredBy :electricity ;
+                      :supportsRecipe :copper_cable_recipe ,
+                                      :electronic_circuit_recipe ,
+                                      :iron_gear_wheel_recipe ;
+                      :powerKW "75"^^xsd:nonNegativeInteger ;
+                      :speed 0.5 .
+
+
+###  https://example.org/factorio#assembling_machine_2
+:assembling_machine_2 rdf:type owl:NamedIndividual ,
+                               :Assembler ,
+                               :Machine ,
+                               :ProductionEntity ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :poweredBy ;
+                                 owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                 owl:onClass :PowerSource
+                               ] ;
+                      :availableOn :nauvis ,
+                                   :vulcanus ;
+                      :poweredBy :electricity ;
+                      :supportsRecipe :copper_cable_recipe ,
+                                      :electronic_circuit_recipe ,
+                                      :iron_gear_wheel_recipe ;
+                      :powerKW "150"^^xsd:nonNegativeInteger ;
+                      :speed 0.75 .
+
+
+###  https://example.org/factorio#calcite
+:calcite rdf:type owl:NamedIndividual ,
+                  :Material ,
+                  :ProductionEntity ,
+                  :RawResource ,
+                  :SolidResource .
+
+
+###  https://example.org/factorio#chemical_plant
+:chemical_plant rdf:type owl:NamedIndividual ,
+                         :ChemicalPlant ,
+                         :Machine ,
+                         :ProductionEntity ,
+                         [ rdf:type owl:Restriction ;
+                           owl:onProperty :poweredBy ;
+                           owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                           owl:onClass :PowerSource
+                         ] ;
+                :availableOn :nauvis ,
+                             :vulcanus ;
+                :poweredBy :electricity ;
+                :supportsRecipe :plastic_bar_recipe ,
+                                :sulfur_recipe ;
+                :powerKW "210"^^xsd:nonNegativeInteger ;
+                :speed 1.0 .
+
+
+###  https://example.org/factorio#coal
+:coal rdf:type owl:NamedIndividual ,
+               :Material ,
+               :ProductionEntity ,
+               :RawResource ,
+               :SolidResource .
+
+
+###  https://example.org/factorio#copper_cable
+:copper_cable rdf:type owl:NamedIndividual ,
+                       :IntermediateProduct ,
+                       :Material ,
+                       :ProductionEntity ;
+              :rawMaterial :copper_ore .
+
+
+###  https://example.org/factorio#copper_cable_recipe
+:copper_cable_recipe rdf:type owl:NamedIndividual ,
+                              :Recipe ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :produces ;
+                                owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                owl:onClass :IntermediateProduct
+                              ] ;
+                     :hasIngredientUse :ingredient_use_6 ;
+                     :produces :copper_cable ;
+                     :yield "2"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#copper_ore
+:copper_ore rdf:type owl:NamedIndividual ,
+                     :Material ,
+                     :ProductionEntity ,
+                     :RawResource ,
+                     :SolidResource .
+
+
+###  https://example.org/factorio#copper_plate
+:copper_plate rdf:type owl:NamedIndividual ,
+                       :IntermediateProduct ,
+                       :Material ,
+                       :MetalPlate ,
+                       :ProductionEntity ;
+              :rawMaterial :copper_ore .
+
+
+###  https://example.org/factorio#copper_plate_recipe
+:copper_plate_recipe rdf:type owl:NamedIndividual ,
+                              :Recipe ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :produces ;
+                                owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                owl:onClass :IntermediateProduct
+                              ] ;
+                     :hasIngredientUse :ingredient_use_2 ;
+                     :produces :copper_plate ;
+                     :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#crude_oil
+:crude_oil rdf:type owl:NamedIndividual ,
+                    :FluidResource ,
+                    :Material ,
+                    :ProductionEntity ,
+                    :RawResource .
+
+
+###  https://example.org/factorio#electric_furnace
+:electric_furnace rdf:type owl:NamedIndividual ,
+                           :Furnace ,
+                           :Machine ,
+                           :ProductionEntity ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :poweredBy ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :PowerSource
+                           ] ;
+                  :availableOn :nauvis ,
+                               :vulcanus ;
+                  :poweredBy :electricity ;
+                  :supportsRecipe :copper_plate_recipe ,
+                                  :iron_plate_recipe ,
+                                  :steel_plate_recipe ,
+                                  :stone_brick_recipe ;
+                  :powerKW "180"^^xsd:nonNegativeInteger ;
+                  :speed 2.0 .
+
+
+###  https://example.org/factorio#electricity
+:electricity rdf:type owl:NamedIndividual ,
+                      :PowerSource ;
+             owl:differentFrom :fuel .
+
+
+###  https://example.org/factorio#electrolyte
+:electrolyte rdf:type owl:NamedIndividual ,
+                      :FluidResource ,
+                      :Material ,
+                      :ProductionEntity ,
+                      :RawResource .
+
+
+###  https://example.org/factorio#electronic_circuit
+:electronic_circuit rdf:type owl:NamedIndividual ,
+                             :IntermediateProduct ,
+                             :Material ,
+                             :ProductionEntity ;
+                    :rawMaterial :copper_ore ,
+                                 :iron_ore .
+
+
+###  https://example.org/factorio#electronic_circuit_recipe
+:electronic_circuit_recipe rdf:type owl:NamedIndividual ,
+                                    :Recipe ,
+                                    [ rdf:type owl:Restriction ;
+                                      owl:onProperty :produces ;
+                                      owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                      owl:onClass :IntermediateProduct
+                                    ] ;
+                           :hasIngredientUse :ingredient_use_7 ,
+                                             :ingredient_use_8 ;
+                           :produces :electronic_circuit ;
+                           :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#foundry
+:foundry rdf:type owl:NamedIndividual ,
+                  :Foundry ,
+                  :Machine ,
+                  :ProductionEntity ,
+                  [ rdf:type owl:Restriction ;
+                    owl:onProperty :poweredBy ;
+                    owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                    owl:onClass :PowerSource
+                  ] ;
+         :availableOn :vulcanus ;
+         :poweredBy :electricity ;
+         :supportsRecipe :molten_iron_recipe ;
+         :powerKW "2500"^^xsd:nonNegativeInteger ;
+         :speed 4.0 .
+
+
+###  https://example.org/factorio#fuel
+:fuel rdf:type owl:NamedIndividual ,
+               :PowerSource .
+
+
+###  https://example.org/factorio#heavy_oil
+:heavy_oil rdf:type owl:NamedIndividual ,
+                    :FluidResource ,
+                    :Material ,
+                    :ProductionEntity ,
+                    :RawResource .
+
+
+###  https://example.org/factorio#holmium_ore
+:holmium_ore rdf:type owl:NamedIndividual ,
+                      :Material ,
+                      :ProductionEntity ,
+                      :RawResource ,
+                      :SolidResource .
+
+
+###  https://example.org/factorio#holmium_solution
+:holmium_solution rdf:type owl:NamedIndividual ,
+                           :FluidResource ,
+                           :Material ,
+                           :ProductionEntity ,
+                           :RawResource .
+
+
+###  https://example.org/factorio#ingredient_use_1
+:ingredient_use_1 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :iron_ore ;
+                  :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_10
+:ingredient_use_10 rdf:type owl:NamedIndividual ,
+                            :IngredientUse ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :material ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Material
+                            ] ;
+                   :material :coal ;
+                   :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_11
+:ingredient_use_11 rdf:type owl:NamedIndividual ,
+                            :IngredientUse ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :material ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Material
+                            ] ;
+                   :material :petroleum_gas ;
+                   :quantity "30"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_12
+:ingredient_use_12 rdf:type owl:NamedIndividual ,
+                            :IngredientUse ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :material ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Material
+                            ] ;
+                   :material :water ;
+                   :quantity "30"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_13
+:ingredient_use_13 rdf:type owl:NamedIndividual ,
+                            :IngredientUse ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :material ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Material
+                            ] ;
+                   :material :iron_ore ;
+                   :quantity "50"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_14
+:ingredient_use_14 rdf:type owl:NamedIndividual ,
+                            :IngredientUse ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :material ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :Material
+                            ] ;
+                   :material :calcite ;
+                   :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_2
+:ingredient_use_2 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :copper_ore ;
+                  :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_3
+:ingredient_use_3 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :iron_plate ;
+                  :quantity "5"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_4
+:ingredient_use_4 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :stone ;
+                  :quantity "2"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_5
+:ingredient_use_5 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :iron_plate ;
+                  :quantity "2"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_6
+:ingredient_use_6 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :copper_plate ;
+                  :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_7
+:ingredient_use_7 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :iron_plate ;
+                  :quantity "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_8
+:ingredient_use_8 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :copper_cable ;
+                  :quantity "3"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#ingredient_use_9
+:ingredient_use_9 rdf:type owl:NamedIndividual ,
+                           :IngredientUse ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :material ;
+                             owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                             owl:onClass :Material
+                           ] ;
+                  :material :petroleum_gas ;
+                  :quantity "20"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#iron_gear_wheel
+:iron_gear_wheel rdf:type owl:NamedIndividual ,
+                          :IntermediateProduct ,
+                          :Material ,
+                          :ProductionEntity ;
+                 :rawMaterial :iron_ore .
+
+
+###  https://example.org/factorio#iron_gear_wheel_recipe
+:iron_gear_wheel_recipe rdf:type owl:NamedIndividual ,
+                                 :Recipe ,
+                                 [ rdf:type owl:Restriction ;
+                                   owl:onProperty :produces ;
+                                   owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                                   owl:onClass :IntermediateProduct
+                                 ] ;
+                        :hasIngredientUse :ingredient_use_5 ;
+                        :produces :iron_gear_wheel ;
+                        :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#iron_ore
+:iron_ore rdf:type owl:NamedIndividual ,
+                   :Material ,
+                   :ProductionEntity ,
+                   :RawResource ,
+                   :SolidResource .
+
+
+###  https://example.org/factorio#iron_plate
+:iron_plate rdf:type owl:NamedIndividual ,
+                     :IntermediateProduct ,
+                     :Material ,
+                     :MetalPlate ,
+                     :ProductionEntity ;
+            :rawMaterial :iron_ore .
+
+
+###  https://example.org/factorio#iron_plate_recipe
+:iron_plate_recipe rdf:type owl:NamedIndividual ,
+                            :Recipe ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :produces ;
+                              owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                              owl:onClass :IntermediateProduct
+                            ] ;
+                   :hasIngredientUse :ingredient_use_1 ;
+                   :produces :iron_plate ;
+                   :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#lava
+:lava rdf:type owl:NamedIndividual ,
+               :FluidResource ,
+               :Material ,
+               :ProductionEntity ,
+               :RawResource .
+
+
+###  https://example.org/factorio#light_oil
+:light_oil rdf:type owl:NamedIndividual ,
+                    :FluidResource ,
+                    :Material ,
+                    :ProductionEntity ,
+                    :RawResource .
+
+
+###  https://example.org/factorio#lithium
+:lithium rdf:type owl:NamedIndividual ,
+                  :Material ,
+                  :ProductionEntity ,
+                  :RawResource ,
+                  :SolidResource .
+
+
+###  https://example.org/factorio#lubricant
+:lubricant rdf:type owl:NamedIndividual ,
+                    :FluidResource ,
+                    :Material ,
+                    :ProductionEntity ,
+                    :RawResource .
+
+
+###  https://example.org/factorio#molten_iron
+:molten_iron rdf:type owl:NamedIndividual ,
+                      :IntermediateProduct ,
+                      :Material ,
+                      :ProductionEntity ;
+             :rawMaterial :calcite ,
+                          :iron_ore .
+
+
+###  https://example.org/factorio#molten_iron_recipe
+:molten_iron_recipe rdf:type owl:NamedIndividual ,
+                             :Recipe ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :produces ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :IntermediateProduct
+                             ] ;
+                    :hasIngredientUse :ingredient_use_13 ,
+                                      :ingredient_use_14 ;
+                    :produces :molten_iron ;
+                    :yield "500"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#nauvis
+:nauvis rdf:type owl:NamedIndividual ,
+                 :Planet .
+
+
+###  https://example.org/factorio#petroleum_gas
+:petroleum_gas rdf:type owl:NamedIndividual ,
+                        :FluidResource ,
+                        :Material ,
+                        :ProductionEntity ,
+                        :RawResource .
+
+
+###  https://example.org/factorio#plastic_bar
+:plastic_bar rdf:type owl:NamedIndividual ,
+                      :IntermediateProduct ,
+                      :Material ,
+                      :ProductionEntity ;
+             :rawMaterial :coal ,
+                          :petroleum_gas .
+
+
+###  https://example.org/factorio#plastic_bar_recipe
+:plastic_bar_recipe rdf:type owl:NamedIndividual ,
+                             :Recipe ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :produces ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :IntermediateProduct
+                             ] ;
+                    :hasIngredientUse :ingredient_use_10 ,
+                                      :ingredient_use_9 ;
+                    :produces :plastic_bar ;
+                    :yield "2"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#steel_furnace
+:steel_furnace rdf:type owl:NamedIndividual ,
+                        :Furnace ,
+                        :Machine ,
+                        :ProductionEntity ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :poweredBy ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :PowerSource
+                        ] ;
+               :availableOn :nauvis ,
+                            :vulcanus ;
+               :poweredBy :fuel ;
+               :supportsRecipe :copper_plate_recipe ,
+                               :iron_plate_recipe ,
+                               :steel_plate_recipe ,
+                               :stone_brick_recipe ;
+               :powerKW "0"^^xsd:nonNegativeInteger ;
+               :speed 2.0 .
+
+
+###  https://example.org/factorio#steel_plate
+:steel_plate rdf:type owl:NamedIndividual ,
+                      :IntermediateProduct ,
+                      :Material ,
+                      :MetalPlate ,
+                      :ProductionEntity ;
+             :rawMaterial :iron_ore .
+
+
+###  https://example.org/factorio#steel_plate_recipe
+:steel_plate_recipe rdf:type owl:NamedIndividual ,
+                             :Recipe ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :produces ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :IntermediateProduct
+                             ] ;
+                    :hasIngredientUse :ingredient_use_3 ;
+                    :produces :steel_plate ;
+                    :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#stone
+:stone rdf:type owl:NamedIndividual ,
+                :Material ,
+                :ProductionEntity ,
+                :RawResource ,
+                :SolidResource .
+
+
+###  https://example.org/factorio#stone_brick
+:stone_brick rdf:type owl:NamedIndividual ,
+                      :IntermediateProduct ,
+                      :Material ,
+                      :ProductionEntity ;
+             :rawMaterial :stone .
+
+
+###  https://example.org/factorio#stone_brick_recipe
+:stone_brick_recipe rdf:type owl:NamedIndividual ,
+                             :Recipe ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :produces ;
+                               owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass :IntermediateProduct
+                             ] ;
+                    :hasIngredientUse :ingredient_use_4 ;
+                    :produces :stone_brick ;
+                    :yield "1"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#stone_furnace
+:stone_furnace rdf:type owl:NamedIndividual ,
+                        :Furnace ,
+                        :Machine ,
+                        :ProductionEntity ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :poweredBy ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :PowerSource
+                        ] ;
+               :availableOn :nauvis ,
+                            :vulcanus ;
+               :poweredBy :fuel ;
+               :supportsRecipe :copper_plate_recipe ,
+                               :iron_plate_recipe ,
+                               :steel_plate_recipe ,
+                               :stone_brick_recipe ;
+               :powerKW "0"^^xsd:nonNegativeInteger ;
+               :speed 1.0 .
+
+
+###  https://example.org/factorio#sulfur
+:sulfur rdf:type owl:NamedIndividual ,
+                 :IntermediateProduct ,
+                 :Material ,
+                 :ProductionEntity ;
+        :rawMaterial :petroleum_gas ,
+                     :water .
+
+
+###  https://example.org/factorio#sulfur_recipe
+:sulfur_recipe rdf:type owl:NamedIndividual ,
+                        :Recipe ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :produces ;
+                          owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                          owl:onClass :IntermediateProduct
+                        ] ;
+               :hasIngredientUse :ingredient_use_11 ,
+                                 :ingredient_use_12 ;
+               :produces :sulfur ;
+               :yield "2"^^xsd:positiveInteger .
+
+
+###  https://example.org/factorio#sulfuric_acid
+:sulfuric_acid rdf:type owl:NamedIndividual ,
+                        :FluidResource ,
+                        :Material ,
+                        :ProductionEntity ,
+                        :RawResource .
+
+
+###  https://example.org/factorio#tungsten_ore
+:tungsten_ore rdf:type owl:NamedIndividual ,
+                       :Material ,
+                       :ProductionEntity ,
+                       :RawResource ,
+                       :SolidResource .
+
+
+###  https://example.org/factorio#uranium_ore
+:uranium_ore rdf:type owl:NamedIndividual ,
+                      :Material ,
+                      :ProductionEntity ,
+                      :RawResource ,
+                      :SolidResource .
+
+
+###  https://example.org/factorio#vulcanus
+:vulcanus rdf:type owl:NamedIndividual ,
+                   :Planet .
+
+
+###  https://example.org/factorio#water
+:water rdf:type owl:NamedIndividual ,
+                :FluidResource ,
+                :Material ,
+                :ProductionEntity ,
+                :RawResource .
+
+
+###  https://example.org/factorio#wood
+:wood rdf:type owl:NamedIndividual ,
+               :Material ,
+               :ProductionEntity ,
+               :RawResource ,
+               :SolidResource .
+
+
+#################################################################
+#    Rules
+#################################################################
+
+:r rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+:p rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+:u rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+:c rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+:m rdf:type <http://www.w3.org/2003/11/swrl#Variable> .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "" ;
+   rdfs:label "RawMaterialDirect" ;
+   rdf:type <http://www.w3.org/2003/11/swrl#Imp> ;
+   <http://www.w3.org/2003/11/swrl#body> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#propertyPredicate> :produces ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> :r ;
+                                                       <http://www.w3.org/2003/11/swrl#argument2> :p
+                                                     ] ;
+                                           rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                      rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                  <http://www.w3.org/2003/11/swrl#propertyPredicate> :hasIngredientUse ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument1> :r ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument2> :u
+                                                                ] ;
+                                                      rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                 rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                             <http://www.w3.org/2003/11/swrl#propertyPredicate> :material ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument1> :u ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument2> :m
+                                                                           ] ;
+                                                                 rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                            rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#ClassAtom> ;
+                                                                                        <http://www.w3.org/2003/11/swrl#classPredicate> :RawResource ;
+                                                                                        <http://www.w3.org/2003/11/swrl#argument1> :m
+                                                                                      ] ;
+                                                                            rdf:rest rdf:nil
+                                                                          ]
+                                                               ]
+                                                    ]
+                                         ] ;
+   <http://www.w3.org/2003/11/swrl#head> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#propertyPredicate> :rawMaterial ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> :p ;
+                                                       <http://www.w3.org/2003/11/swrl#argument2> :m
+                                                     ] ;
+                                           rdf:rest rdf:nil
+                                         ]
+ ] .
+
+[ <http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled> "true"^^xsd:boolean ;
+   rdfs:comment "" ;
+   rdfs:label "RawMaterialRecursive" ;
+   rdf:type <http://www.w3.org/2003/11/swrl#Imp> ;
+   <http://www.w3.org/2003/11/swrl#body> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#propertyPredicate> :produces ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> :r ;
+                                                       <http://www.w3.org/2003/11/swrl#argument2> :p
+                                                     ] ;
+                                           rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                      rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                  <http://www.w3.org/2003/11/swrl#propertyPredicate> :hasIngredientUse ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument1> :r ;
+                                                                  <http://www.w3.org/2003/11/swrl#argument2> :u
+                                                                ] ;
+                                                      rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                 rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                             <http://www.w3.org/2003/11/swrl#propertyPredicate> :material ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument1> :u ;
+                                                                             <http://www.w3.org/2003/11/swrl#argument2> :c
+                                                                           ] ;
+                                                                 rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                            rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#ClassAtom> ;
+                                                                                        <http://www.w3.org/2003/11/swrl#classPredicate> :IntermediateProduct ;
+                                                                                        <http://www.w3.org/2003/11/swrl#argument1> :c
+                                                                                      ] ;
+                                                                            rdf:rest [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                                                                       rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                                                                   <http://www.w3.org/2003/11/swrl#propertyPredicate> :rawMaterial ;
+                                                                                                   <http://www.w3.org/2003/11/swrl#argument1> :c ;
+                                                                                                   <http://www.w3.org/2003/11/swrl#argument2> :m
+                                                                                                 ] ;
+                                                                                       rdf:rest rdf:nil
+                                                                                     ]
+                                                                          ]
+                                                               ]
+                                                    ]
+                                         ] ;
+   <http://www.w3.org/2003/11/swrl#head> [ rdf:type <http://www.w3.org/2003/11/swrl#AtomList> ;
+                                           rdf:first [ rdf:type <http://www.w3.org/2003/11/swrl#IndividualPropertyAtom> ;
+                                                       <http://www.w3.org/2003/11/swrl#propertyPredicate> :rawMaterial ;
+                                                       <http://www.w3.org/2003/11/swrl#argument1> :p ;
+                                                       <http://www.w3.org/2003/11/swrl#argument2> :m
+                                                     ] ;
+                                           rdf:rest rdf:nil
+                                         ]
+ ] .
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
